@@ -1,0 +1,89 @@
+---
+title: "Economist Plot"
+author: "Damjan Stefanovski"
+date: "July 10, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## A correlation between corruption and development
+This is a Plot from the Economist Magazine about the coruption in diferenct countries in the world.
+
+Comparing the corruption index with the UN's Human Development Index (a measure combining health, wealth and education), demonstrates an interesting connection.
+```{r}
+library(ggplot2)
+library(data.table)
+df <- fread("Economist_Assignment_Data.csv", drop=1)
+print(head(df))
+```
+When the corruption index is between approximately 2.0 and 4.0 there appears to be little relationship with the human development index, but as it rises beyond 4.0 a stronger connection can be seen. 
+
+```{r}
+pl <- ggplot(df, aes(x=CPI, y=HDI, color=Region)) + geom_point(size =4, shape=1)
+print(pl)
+```
+# THE use of public office for private gain benefits a powerful few while imposing costs on large swathes of society. Transparency International's annual Corruption Perceptions Index, published on December 1st, measures the perceived levels of public-sector graft by aggregating independent surveys from across the globe. Just five non-OECD countries make the top 25: Singapore, Hong Kong, Barbados, Bahamas and Qatar.
+
+
+```{r}
+pl2 <- pl + geom_smooth(aes(group=1), method="lm", formula = y~log(x),se=FALSE, color="red")
+print(pl2)
+```
+# The bottom is formed mainly of failed states, poor African countries and nations that either were once communist (Turkmenistan) or are still run along similar lines (Venezuela, Cuba). Comparing the corruption index with the UN's Human Development Index (a measure combining health, wealth and education), demonstrates an interesting connection
+
+
+Subsetting the Countries...
+```{r}
+pl3 <- pl2 + geom_text(aes(label=Country))
+pointsToLabel <- c("Russia", "Venezuela", "Iraq", "Myanmar", "Sudan",
+                   "Afghanistan", "Congo", "Greece", "Argentina", "Brazil",
+                   "India", "Italy", "China", "South Africa", "Spane",
+                   "Botswana", "Cape Verde", "Bhutan", "Rwanda", "France",
+                   "United States", "Germany", "Britain", "Barbados", "Norway", "Japan",
+                   "New Zealand", "Singapore")
+
+pl3 <- pl2 + geom_text(aes(label = Country), color = "gray20", 
+                data = subset(df, Country %in% pointsToLabel),check_overlap = TRUE)
+
+pl3
+```
+
+```{r}
+pl4 <- pl3 + theme_bw() 
+
+pl5 <- pl4 + scale_x_continuous(name = "Corruption Perceptions Index, 2011 (10=least corrupt)",
+                     limits = c(.9, 10.5),breaks=1:10) 
+pl6 <- pl5 + scale_y_continuous(name = "Human Development Index, 2011 (1=Best)",
+                     limits = c(0.2, 1.0))
+pl6 + ggtitle("Corruption and Human development")
+library(ggthemes)
+pl6 + theme_economist()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
